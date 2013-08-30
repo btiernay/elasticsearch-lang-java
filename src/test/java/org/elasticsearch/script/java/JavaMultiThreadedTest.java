@@ -35,6 +35,9 @@ import org.elasticsearch.common.util.concurrent.jsr166y.ThreadLocalRandom;
 import org.elasticsearch.script.ExecutableScript;
 import org.junit.Test;
 
+/**
+ * This test currently fails since the scripts are not threadsafe!
+ */
 public class JavaMultiThreadedTest {
 
 		private static final String script = "return ((Long)vars(\"x\")) + ((Long)vars(\"y\"));";

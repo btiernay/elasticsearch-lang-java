@@ -28,7 +28,7 @@ import org.elasticsearch.search.lookup.SearchLookup;
 public class JavaEngineService extends AbstractComponent implements ScriptEngineService {
 
 	private static final AtomicInteger i = new AtomicInteger();
-	
+
 	private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 	private final JavaFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
@@ -73,29 +73,30 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		compiler.getTask(null, fileManager, null, null, null, javaFiles).call();
 
 		try {
-			return fileManager.getClassLoader(null).loadClass(qualifiedClassName).newInstance();
+			return fileManager.getClassLoader(null).loadClass(qualifiedClassName);
 		} catch (Exception e) {
-			throw new ScriptException("Exception creating script class: " + qualifiedClassName + " with source: " + classSource, e);
+			throw new ScriptException("Exception creating script class: " + qualifiedClassName + " with source: "
+					+ classSource, e);
 		}
 	}
 
 	@Override
 	public Object execute(Object compiledScript, Map<String, Object> vars) {
-		AbstractJavaScript script = (AbstractJavaScript) compiledScript;
+		AbstractJavaScript script = createScript(compiledScript);
 		setVars(vars, script);
 		return script.run();
 	}
 
 	@Override
 	public ExecutableScript executable(Object compiledScript, Map<String, Object> vars) {
-		AbstractJavaScript script = (AbstractJavaScript) compiledScript;
+		AbstractJavaScript script = createScript(compiledScript);
 		setVars(vars, script);
 		return script;
 	}
 
 	@Override
 	public SearchScript search(Object compiledScript, SearchLookup lookup, @Nullable Map<String, Object> vars) {
-		AbstractJavaScript script = (AbstractJavaScript) compiledScript;
+		AbstractJavaScript script = createScript(compiledScript);
 		setVars(vars, script);
 		script.setLookup(lookup);
 		return script;
@@ -104,6 +105,15 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 	@Override
 	public Object unwrap(Object value) {
 		return value;
+	}
+
+	private static AbstractJavaScript createScript(Object compiledScript) {
+		Class<?> scriptClass = (Class<?>) compiledScript;
+		try {
+			return (AbstractJavaScript) scriptClass.newInstance();
+		} catch (Exception e) {
+			throw new ScriptException("Exception creating script class: " + compiledScript, e);
+		}
 	}
 
 	private void setVars(Map<String, Object> vars, AbstractJavaScript script) {
