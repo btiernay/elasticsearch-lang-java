@@ -3,7 +3,6 @@ package org.elasticsearch.script;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.elasticsearch.script.AbstractSearchScript;
 import org.elasticsearch.search.lookup.SearchLookup;
 
 /**

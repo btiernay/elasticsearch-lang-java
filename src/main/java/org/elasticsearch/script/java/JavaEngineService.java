@@ -118,7 +118,7 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 			return script;
 		} catch (Exception e) {
-			throw new ScriptException("Exception creating script class: " + compiledScript, e);
+			throw new ScriptException("Exception instantiating script object: " + compiledScript, e);
 		}
 	}
 

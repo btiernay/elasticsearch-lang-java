@@ -48,5 +48,5 @@ class JavaClassObject extends SimpleJavaFileObject {
 	public OutputStream openOutputStream() throws IOException {
 		return bos;
 	}
-	
+
 }
