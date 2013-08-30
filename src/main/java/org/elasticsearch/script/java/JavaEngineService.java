@@ -27,7 +27,8 @@ import org.elasticsearch.search.lookup.SearchLookup;
  */
 public class JavaEngineService extends AbstractComponent implements ScriptEngineService {
 
-	private final AtomicInteger i = new AtomicInteger();
+	private static final AtomicInteger i = new AtomicInteger();
+	
 	private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 	private final JavaFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
@@ -53,28 +54,28 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	@Override
 	public Object compile(String script) {
+		String classPackage = getClass().getPackage().getName();
 		String className = "Java" + i.incrementAndGet();
 		String classSource = //
-		"package" + getClass().getName() + ";\n" + //
+		"package " + classPackage + ";\n" + //
 				"import " + AbstractJavaScript.class.getName() + ";\n" + //
 				"import java.util.*;\n" + //
-				"import gnu.trove.*;\n" + //
-				"import org.joda.*;\n" + //
-				"import static System.currentTimeMillis;\n" + //
+				"import static java.lang.System.currentTimeMillis;\n" + //
 				"public class " + className + " extends AbstractJavaScript {\n" + //
 				"   protected Object execute() {\n" + //
 				"   " + script + "\n" + //
 				"   }\n" + //
 				"}\n";
 
+		String qualifiedClassName = classPackage + "." + className;
 		List<JavaFileObject> javaFiles = new ArrayList<JavaFileObject>();
-		javaFiles.add(new CharSequenceJavaFileObject(className, classSource));
+		javaFiles.add(new CharSequenceJavaFileObject(qualifiedClassName, classSource));
 		compiler.getTask(null, fileManager, null, null, null, javaFiles).call();
 
 		try {
-			return fileManager.getClassLoader(null).loadClass(className).newInstance();
+			return fileManager.getClassLoader(null).loadClass(qualifiedClassName).newInstance();
 		} catch (Exception e) {
-			throw new ScriptException("Exception creating script class: " + className + " with source: " + classSource, e);
+			throw new ScriptException("Exception creating script class: " + qualifiedClassName + " with source: " + classSource, e);
 		}
 	}
 
