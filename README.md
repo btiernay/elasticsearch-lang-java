@@ -3,7 +3,7 @@ Java lang Plugin for ElasticSearch
 
 The Java language plugin allows to have `java` as the language of scripts to execute.
 
-In order to install the plugin, simply run: `bin/plugin -install btiernay/elasticsearch-lang-java/`.
+The main value add of this plugin is that it allows users to create fast native Java based scripts inside of a query, without having to distribute the scripts to each node as a configuration step. This greatly simplifies operational concerns involved in using native scripts.
 
 License
 -------
