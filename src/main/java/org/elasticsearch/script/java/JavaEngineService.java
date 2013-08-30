@@ -22,9 +22,6 @@ import org.elasticsearch.script.ScriptException;
 import org.elasticsearch.script.SearchScript;
 import org.elasticsearch.search.lookup.SearchLookup;
 
-/**
- * See http://www.javablogging.com/dynamic-in-memory-compilation/
- */
 public class JavaEngineService extends AbstractComponent implements ScriptEngineService {
 
 	private static final AtomicInteger i = new AtomicInteger();

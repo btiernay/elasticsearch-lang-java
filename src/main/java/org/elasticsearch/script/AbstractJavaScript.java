@@ -7,7 +7,8 @@ import org.elasticsearch.script.AbstractSearchScript;
 import org.elasticsearch.search.lookup.SearchLookup;
 
 /**
- * This class needs to be in this package to expose {@link #setLookup(SearchLookup)}.
+ * This class needs to be in this package to expose
+ * {@link #setLookup(SearchLookup)}.
  */
 public abstract class AbstractJavaScript extends AbstractSearchScript {
 
@@ -19,11 +20,7 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 
 	@Override
 	public Object run() {
-		try {
-			return execute();
-		} finally {
-			vars.clear();
-		}
+		return execute();
 	}
 
 	protected abstract Object execute();
