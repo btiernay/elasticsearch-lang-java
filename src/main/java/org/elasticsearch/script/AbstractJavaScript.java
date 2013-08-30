@@ -6,14 +6,13 @@ import java.util.Map;
 import org.elasticsearch.script.AbstractSearchScript;
 import org.elasticsearch.search.lookup.SearchLookup;
 
+/**
+ * This class needs to be in this package to expose {@link #setLookup(SearchLookup)}.
+ */
 public abstract class AbstractJavaScript extends AbstractSearchScript {
 
 	private final Map<String, Object> vars = new HashMap<String, Object>();
 
-	/**
-	 * This class Needs to be in this package to expose this setter.
-	 * @param lookup
-	 */
 	public void setLookup(SearchLookup lookup) {
 		super.setLookup(lookup);
 	}
