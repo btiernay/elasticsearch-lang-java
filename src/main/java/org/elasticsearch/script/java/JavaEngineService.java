@@ -1,6 +1,7 @@
 package org.elasticsearch.script.java;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +15,8 @@ import javax.tools.ToolProvider;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.script.AbstractJavaScript;
 import org.elasticsearch.script.ExecutableScript;
@@ -29,14 +32,15 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 	private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 	private final JavaFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
+	protected final ESLogger logger = Loggers.getLogger(getClass());
+
 	@Inject
 	public JavaEngineService(Settings settings) {
 		super(settings);
 	}
 
-	@Override
 	public void close() {
-		// nothing to do here...
+		// Nothing to do here...
 	}
 
 	@Override
@@ -51,22 +55,27 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	@Override
 	public Object compile(String script) {
-		String classPackage = getClass().getPackage().getName();
-		String className = "Java" + i.incrementAndGet();
+		String classPackage = getClass().getPackage().getName() + ".generated";
+		String className = "GeneratedJavaScript" + i.incrementAndGet();
 		String classSource = //
-		"package " + classPackage + ";\n" + //
+		"// Generated on " + new Date() + "\n" + //
+				"package " + classPackage + ";\n" + //
+				"\n" + //
 				"import " + AbstractJavaScript.class.getName() + ";\n" + //
 				"import java.util.*;\n" + //
 				"import static java.lang.System.currentTimeMillis;\n" + //
+				"\n" + //
 				"public class " + className + " extends AbstractJavaScript {\n" + //
 				"   protected Object execute() {\n" + //
-				"   " + script + "\n" + //
+				"      " + script + "\n" + //
 				"   }\n" + //
 				"}\n";
 
 		String qualifiedClassName = classPackage + "." + className;
 		List<JavaFileObject> javaFiles = new ArrayList<JavaFileObject>();
 		javaFiles.add(new CharSequenceJavaFileObject(qualifiedClassName, classSource));
+
+		logger.debug("Creating java script class:\n{}", classSource);
 		compiler.getTask(null, fileManager, null, null, null, javaFiles).call();
 
 		try {
@@ -79,22 +88,19 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	@Override
 	public Object execute(Object compiledScript, Map<String, Object> vars) {
-		AbstractJavaScript script = createScript(compiledScript);
-		setVars(vars, script);
+		AbstractJavaScript script = createScript(compiledScript, vars);
 		return script.run();
 	}
 
 	@Override
 	public ExecutableScript executable(Object compiledScript, Map<String, Object> vars) {
-		AbstractJavaScript script = createScript(compiledScript);
-		setVars(vars, script);
+		AbstractJavaScript script = createScript(compiledScript, vars);
 		return script;
 	}
 
 	@Override
 	public SearchScript search(Object compiledScript, SearchLookup lookup, @Nullable Map<String, Object> vars) {
-		AbstractJavaScript script = createScript(compiledScript);
-		setVars(vars, script);
+		AbstractJavaScript script = createScript(compiledScript, vars);
 		script.setLookup(lookup);
 		return script;
 	}
@@ -104,16 +110,19 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		return value;
 	}
 
-	private static AbstractJavaScript createScript(Object compiledScript) {
-		Class<?> scriptClass = (Class<?>) compiledScript;
+	private static AbstractJavaScript createScript(Object compiledScript, Map<String, Object> vars) {
 		try {
-			return (AbstractJavaScript) scriptClass.newInstance();
+			Class<?> scriptClass = (Class<?>) compiledScript;
+			AbstractJavaScript script = (AbstractJavaScript) scriptClass.newInstance();
+			setVars(vars, script);
+
+			return script;
 		} catch (Exception e) {
 			throw new ScriptException("Exception creating script class: " + compiledScript, e);
 		}
 	}
 
-	private void setVars(Map<String, Object> vars, AbstractJavaScript script) {
+	private static void setVars(Map<String, Object> vars, AbstractJavaScript script) {
 		for (Entry<String, Object> entry : vars.entrySet()) {
 			script.setNextVar(entry.getKey(), entry.getValue());
 		}
