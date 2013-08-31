@@ -1,6 +1,7 @@
 package org.elasticsearch.script.java;
 
 import java.io.IOException;
+import java.security.SecureClassLoader;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -18,7 +19,7 @@ class MemoryJavaFileManager extends ForwardingJavaFileManager<StandardJavaFileMa
 
 	@Override
 	public ClassLoader getClassLoader(Location location) {
-		return new ClassLoader() {
+		return new SecureClassLoader() {
 			@Override
 			protected Class<?> findClass(String name) throws ClassNotFoundException {
 				byte[] b = javaFileObject.getBytes();

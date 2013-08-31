@@ -1,8 +1,8 @@
 package org.elasticsearch.script.java;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.elasticsearch.common.Nullable;
@@ -31,15 +30,13 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	private static final AtomicInteger i = new AtomicInteger();
 
+	private static final String GENERATED_PACKAGE_NAME = JavaEngineService.class.getPackage().getName() + ".generated";
+	
 	protected final ESLogger logger = Loggers.getLogger(getClass());
 
 	@Inject
 	public JavaEngineService(Settings settings) {
 		super(settings);
-	}
-
-	public void close() {
-		// Nothing to do here...
 	}
 
 	@Override
@@ -54,7 +51,7 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	@Override
 	public Object compile(String script) {
-		String classPackage = getClass().getPackage().getName() + ".generated";
+		String classPackage = GENERATED_PACKAGE_NAME;
 		String className = "GeneratedJavaScript" + i.incrementAndGet();
 		String classSource = "" + //
 				"// Generated on " + new Date() + "\n" + //
@@ -70,50 +67,22 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 				"   }\n" + //
 				"}\n";
 
-		String qualifiedClassName = classPackage + "." + className;
-		List<JavaFileObject> javaFiles = new ArrayList<JavaFileObject>();
-		javaFiles.add(new CharSequenceJavaFileObject(qualifiedClassName, classSource));
-
-		logger.debug("Creating java script class:\n{}", classSource);
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-		// Set compiler's classpath to be same as the runtime's
-		List<String> options = new ArrayList<String>();
-		String classpath = System.getProperty("java.class.path") + System.getProperty("path.separator")
-				+ getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-		options.addAll(Arrays.asList("-classpath", classpath));
-
-		StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
-		MemoryJavaFileManager fileManager = new MemoryJavaFileManager(standardFileManager);
-		StringWriter writer = new StringWriter();
-
-		Boolean success = compiler.getTask(writer, fileManager, null, options, null, javaFiles).call();
-		if (!success) {
-			throw new ScriptException("Could not compile script: " + writer.toString() + " using classpath: " + classpath);
-		}
-
-		try {
-			ClassLoader classLoader = fileManager.getClassLoader(null);
-			return classLoader.loadClass(qualifiedClassName);
-		} catch (Exception e) {
-			throw new ScriptException(e.getClass().getSimpleName() + " creating script class: " + qualifiedClassName
-					+ " with source:\n" + classSource, e);
-		}
+		return compile(classPackage, className, classSource);
 	}
 
 	@Override
 	public Object execute(Object compiledScript, Map<String, Object> vars) {
-		return instance(compiledScript, vars, null).run();
+		return create(compiledScript, vars, null).run();
 	}
 
 	@Override
 	public ExecutableScript executable(Object compiledScript, Map<String, Object> vars) {
-		return instance(compiledScript, vars, null);
+		return create(compiledScript, vars, null);
 	}
 
 	@Override
 	public SearchScript search(Object compiledScript, SearchLookup lookup, @Nullable Map<String, Object> vars) {
-		return instance(compiledScript, vars, lookup);
+		return create(compiledScript, vars, lookup);
 	}
 
 	@Override
@@ -121,7 +90,35 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		return value;
 	}
 
-	private static AbstractJavaScript instance(Object compiledScript, Map<String, Object> vars, SearchLookup lookup) {
+	public void close() {
+		// Nothing to do here...
+	}
+
+	private Object compile(String classPackage, String className, String classSource) {
+		String qualifiedClassName = classPackage + "." + className;
+		List<JavaFileObject> javaFiles = Collections.<JavaFileObject> singletonList(new CharSequenceJavaFileObject(
+				qualifiedClassName, classSource));
+
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		StringWriter writer = new StringWriter();
+		MemoryJavaFileManager fileManager = new MemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
+
+		logger.debug("Compiling java script class:\n{}", classSource);
+		Boolean success = compiler.getTask(writer, fileManager, null, options(), null, javaFiles).call();
+		if (!success) {
+			throw new ScriptException("Could not compile java script class: " + classSource + " because: "
+					+ writer.toString());
+		}
+
+		try {
+			return fileManager.getClassLoader(null).loadClass(qualifiedClassName);
+		} catch (Exception e) {
+			throw new ScriptException("Exception loading script class: " + qualifiedClassName + " with source:\n"
+					+ classSource, e);
+		}
+	}
+
+	private static AbstractJavaScript create(Object compiledScript, Map<String, Object> vars, SearchLookup lookup) {
 		try {
 			Class<?> scriptClass = (Class<?>) compiledScript;
 			AbstractJavaScript script = (AbstractJavaScript) scriptClass.newInstance();
@@ -138,8 +135,20 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 			return script;
 		} catch (Exception e) {
-			throw new ScriptException(e.getClass().getSimpleName() + " instantiating script object: " + compiledScript, e);
+			throw new ScriptException("Exception instantiating script object: " + compiledScript, e);
 		}
+	}
+
+	private static List<String> options() {
+		// Set compiler's classpath to be same as the runtime's
+		String classpath = System.getProperty("java.class.path") + System.getProperty("path.separator") + getPluginPath();
+		List<String> options = Arrays.asList("-classpath", classpath);
+
+		return options;
+	}
+
+	private static String getPluginPath() {
+		return JavaEngineService.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 	}
 
 }
