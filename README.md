@@ -32,14 +32,14 @@ Be warned that calling methods such as `System.exit()` will succeed in terminati
 Variables
 ---------
 
-Script variables may be accessed via the `Object vars(String name)` method. Depending on the script context, the following members will also be available:
+Script variables may be accessed via the `Object var(String name)` method. Depending on the script context, the following members will also be available:
 - `lookup` of type [SearchLookup](https://github.com/elasticsearch/elasticsearch/blob/master/src/main/java/org/elasticsearch/search/lookup/SearchLookup.java)
 - `doc()` of type [DocLookup](https://github.com/elasticsearch/elasticsearch/blob/master/src/main/java/org/elasticsearch/search/lookup/DocLookup.java)
 - `fields()` of type [FieldsLookup](https://github.com/elasticsearch/elasticsearch/blob/master/src/main/java/org/elasticsearch/search/lookup/FieldsLookup.java)
 - `source()` of type [SourceLookup](https://github.com/elasticsearch/elasticsearch/blob/master/src/main/java/org/elasticsearch/search/lookup/SourceLookup.java)
 - `score()` of type `float`
 
-Not that with `vars`, casting the return value is required in order to access object members. This is because compilation occurs before the variable types are supplied / known at runtime. 
+Not that with `var`, casting the return value is required in order to access object members. This is because compilation occurs before the variable types are supplied / known at runtime. 
 
 Examples
 --------
@@ -65,7 +65,7 @@ The following example shows how to execute a Java script using parameters:
 {
     "script_fields" : {
         "result" : {
-            "script" : "return (Integer)vars(\"x\") + (Integer)vars(\"y\");",
+            "script" : "return (Integer)var(\"x\") + (Integer)var(\"y\");",
             "params": {
                 "x": 1,
                 "y": 2
@@ -81,7 +81,7 @@ If your variables consist of a single character, you can simplify the above usin
 {
     "script_fields" : {
         "result" : {
-            "script" : "return (Integer)vars('x') + (Integer)vars('y');",
+            "script" : "return (Integer)var('x') + (Integer)var('y');",
             "params": {
                 "x": 1,
                 "y": 2
