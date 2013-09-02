@@ -19,7 +19,7 @@
     <connection>scm:git:git@github.com:btiernay/elasticsearch-lang-java.git</connection>
     <developerConnection>scm:git:git@github.com:btiernay/elasticsearch-lang-java.git
         </developerConnection>
-    <url>http://github.com/btiernay/elasticsearch-lang-janion</url>
+    <url>http://github.com/btiernay/elasticsearch-lang-java</url>
   </scm>
 
   <parent>
