@@ -72,17 +72,17 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	@Override
 	public Object execute(Object compiledScript, Map<String, Object> vars) {
-		return create(compiledScript, vars, null).run();
+		return newInstance(compiledScript, vars, null).run();
 	}
 
 	@Override
 	public ExecutableScript executable(Object compiledScript, Map<String, Object> vars) {
-		return create(compiledScript, vars, null);
+		return newInstance(compiledScript, vars, null);
 	}
 
 	@Override
 	public SearchScript search(Object compiledScript, SearchLookup lookup, @Nullable Map<String, Object> vars) {
-		return create(compiledScript, vars, lookup);
+		return newInstance(compiledScript, vars, lookup);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		}
 	}
 
-	private static AbstractJavaScript create(Object compiledScript, Map<String, Object> vars, SearchLookup lookup) {
+	private static AbstractJavaScript newInstance(Object compiledScript, Map<String, Object> vars, SearchLookup lookup) {
 		try {
 			Class<?> scriptClass = (Class<?>) compiledScript;
 			AbstractJavaScript script = (AbstractJavaScript) scriptClass.newInstance();

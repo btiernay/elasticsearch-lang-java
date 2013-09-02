@@ -26,7 +26,7 @@ public class JavaEngineServiceTest {
 	}
 
 	@Test
-	public void testSimpleEquation() {
+	public void testSimpleExpression() {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		Object o = engine.execute(engine.compile("return 1 + 2;"), vars);
 		assertThat(((Number) o).intValue(), equalTo(3));
