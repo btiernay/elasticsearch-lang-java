@@ -9,8 +9,9 @@ The main value add of this plugin is that it allows users to create fast native 
 
 Scripts
 -------
-Scripts are written using Java fragments that are inlined into a class template before being compiled with [javax.tools.JavaCompiler](http://docs.oracle.com/javase/6/docs/api/javax/tools/JavaCompiler.html). As such, it is required that you provide a return value in each control path of your script.
+Scripts are written using Java fragments that are inlined into a class template before being compiled with [javax.tools.JavaCompiler](http://docs.oracle.com/javase/6/docs/api/javax/tools/JavaCompiler.html). As such, it is required that you provide a `return` value in each control path of your script.
 
+Be warned that calling methods such as `System.exit()` will succeed in terminating the host JVM.  
 
 Variables
 ---------
