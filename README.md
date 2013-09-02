@@ -16,6 +16,7 @@ Installation
 To install the latest development version:
 
 - `git clone git@github.com:btiernay/elasticsearch-lang-java.git`
+- `cd elasticsearch-lang-java/`
 - `mvn clean package -DskipTests=true`
 - `bin/plugin --url file:./target/elasticsearch-lang-java-<VERSION>.zip --install lang-java`
 
