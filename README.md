@@ -46,6 +46,19 @@ Examples
 
 ### Script Fields
 
+The following example shows how to execute a Java script without parameters:
+
+```json
+{
+    "script_fields" : {
+        "result" : {
+            "script" : "return 1 + 2;"
+            "lang": "java"
+        }
+    }
+}
+```
+
 The following example shows how to execute a Java script using parameters:
 
 ```json
