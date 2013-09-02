@@ -44,7 +44,24 @@ Not that with `vars`, casting the return value is required in order to access ob
 Examples
 --------
 
-TBD
+### Script Fields
+
+The following example shows how to execute a Java script using parameters:
+
+```json
+{
+    "script_fields" : {
+        "result" : {
+            "script" : "return (Integer)vars(\"x\") + (Integer)vars(\"y\");",
+            "params": {
+                "x": 1,
+                "y": 2
+            }, 
+            "lang": "java"
+        }
+    }
+}
+```
 
 Disclaimer
 ----------
