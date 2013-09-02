@@ -37,6 +37,11 @@ Script variables may be accessed via the `Object vars(String name)` method. Depe
 
 Not that with `vars`, casting the return value is required in order to access object members. This is because compilation occurs before the variable types are supplied / known at runtime. 
 
+Examples
+--------
+
+TBD
+
 Disclaimer
 ----------
 
