@@ -5,7 +5,24 @@ The Java language plugin allows to have `java` as the language of scripts to exe
 
 The main value add of this plugin is that it allows users to create fast native Java based scripts inside of a query, without having to distribute the scripts to each node as a configuration step. This greatly simplifies operational concerns involved in using native scripts.
 
-Note that this plugin has not been tested in production and is currently for informational purposes only :)
+Scripts
+-------
+Scripts are written using Java fragments that are inlined into a templated class before compilation. As such, it is required that you provide a return value in each control path of your script.
+
+
+Variables
+---------
+
+Script variables may be accessed via the `Object vars(String name)` method. Depending on the script context, the following methods will also be available:
+- `doc()`
+- `fields()` 
+- `source()` 
+- `score()` 
+
+Disclaimer
+----------
+
+This plugin has not been tested in production and is currently for informational purposes only :)
 
 License
 -------
