@@ -7,8 +7,20 @@ The Java language plugin enables the use of `java` as the language of scripts to
 
 The main value add of this plugin is that it allows users to create fast native Java based scripts inside of a query, without having to distribute the scripts to each node as a configuration step. This greatly simplifies operational concerns involved in using [native scripts](http://www.elasticsearch.org/guide/reference/modules/scripting/).
 
+Installation
+------------
+
+To install the latest development version:
+
+`git clone git@github.com:btiernay/elasticsearch-lang-java.git`
+`mvn clean package -DskipTests=true`
+`bin/plugin --url file:./target/elasticsearch-java-lang-<VERSION>.zip --install lang-java`
+
+For more information, see http://www.elasticsearch.org/guide/reference/modules/plugins/.
+
 Scripts
 -------
+
 Scripts are written using Java fragments that are inlined into a class template before being compiled with [javax.tools.JavaCompiler](http://docs.oracle.com/javase/6/docs/api/javax/tools/JavaCompiler.html). As such, it is required that you provide a `return` value in each control path of your script.
 
 Be warned that calling methods such as `System.exit()` will succeed in terminating the host JVM.  
