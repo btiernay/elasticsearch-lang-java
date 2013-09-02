@@ -77,11 +77,30 @@ The following example shows how to execute a Java script using parameters:
 ```
 
 If your variables consist of a single character, you can simplify the above using: 
+
 ```json
 {
     "script_fields" : {
         "result" : {
             "script" : "return (Integer)var('x') + (Integer)var('y');",
+            "params": {
+                "x": 1,
+                "y": 2
+            }, 
+            "lang": "java"
+        }
+    }
+}
+```
+
+
+If your variables are primitive wrappers, you can simplify the above using: 
+
+```json
+{
+    "script_fields" : {
+        "result" : {
+            "script" : "return integerVar('x') + intergerVar('y');",
             "params": {
                 "x": 1,
                 "y": 2
