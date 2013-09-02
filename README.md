@@ -16,13 +16,14 @@ Be warned that calling methods such as `System.exit()` will succeed in terminati
 Variables
 ---------
 
-Script variables may be accessed via the `Object vars(String name)` method. Depending on the script context, the following methods will also be available:
-- `doc()`
-- `fields()` 
-- `source()` 
-- `score()` 
+Script variables may be accessed via the `Object vars(String name)` method. Depending on the script context, the following members will also be available:
+- `lookup` of type `org.elasticsearch.search.lookup.SearchLookup`
+- `doc()` of type `org.elasticsearch.search.lookup.DocLookup`
+- `fields()` of type `org.elasticsearch.search.lookup.FieldsLookup`
+- `source()` of type `org.elasticsearch.search.lookup.SourceLookup`
+- `score()` of type `float`
 
-For `vars`, casting is required in order to access object members. This is because compilation occurs before the variable types are supplied at runtime. 
+Not that with `vars`, casting the return value is required in order to access object members. This is because compilation occurs before the variable types are supplied / known at runtime. 
 
 Disclaimer
 ----------
