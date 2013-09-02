@@ -3,7 +3,7 @@
 Java lang Plugin for ElasticSearch
 ==================================
 
-The Java language plugin enables the use of `java` as the language of scripts to execute.
+The Java language plugin enables the use of `java` as the language of scripts to execute. It is simple, lightweight and requires no additional classpath dependencies. 
 
 Motivation
 ----------
