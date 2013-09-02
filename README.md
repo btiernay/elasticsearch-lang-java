@@ -45,7 +45,7 @@ TBD
 Disclaimer
 ----------
 
-This plugin has not been tested in production and is currently for informational purposes only :)
+This plugin has not been tested in production and is currently for development purposes only.
 
 License
 -------
