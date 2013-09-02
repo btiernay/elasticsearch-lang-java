@@ -1,3 +1,5 @@
+![Java](http://www.binary-studio.com/media/36243/java_development_services.png)
+
 Java lang Plugin for ElasticSearch
 ==================================
 
