@@ -5,7 +5,7 @@ Java lang Plugin for ElasticSearch
 
 The Java language plugin enables the use of `java` as the language of scripts to execute.
 
-The main value add of this plugin is that it allows users to create fast native Java based scripts inside of a query, without having to distribute the scripts to each node as a configuration step. This greatly simplifies operational concerns involved in using [native scripts](http://www.elasticsearch.org/guide/reference/modules/scripting/).
+The main value add of this plugin is that it allows users to create fast native Java based scripts inside of a query, without having to distribute the scripts to each node as a configuration step. This greatly simplifies the operational concerns associated with using the alternative: [native scripts](http://www.elasticsearch.org/guide/reference/modules/scripting/).
 
 Installation
 ------------
