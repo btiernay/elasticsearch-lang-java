@@ -49,5 +49,14 @@ public class JavaEngineServiceTest {
 		Object o = engine.execute(engine.compile("return vars('x');"), vars);
 		assertThat(((Number) o).intValue(), equalTo(1));
 	}
+	
+	@Test
+	public void testInvalidSimpleVarAccessUsingCharName() {
+		Map<String, Object> vars = new HashMap<String, Object>();
+		vars.put("x", 1);
+
+		Object o = engine.execute(engine.compile("return x;"), vars);
+		assertThat(((Number) o).intValue(), equalTo(1));
+	}
 
 }
