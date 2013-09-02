@@ -33,11 +33,20 @@ public class JavaEngineServiceTest {
 	}
 
 	@Test
-	public void testSimpleVarAccess() {
+	public void testSimpleVarAccessUsingStringName() {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("x", 1);
 
 		Object o = engine.execute(engine.compile("return vars(\"x\");"), vars);
+		assertThat(((Number) o).intValue(), equalTo(1));
+	}
+	
+	@Test
+	public void testSimpleVarAccessUsingCharName() {
+		Map<String, Object> vars = new HashMap<String, Object>();
+		vars.put("x", 1);
+
+		Object o = engine.execute(engine.compile("return vars('x');"), vars);
 		assertThat(((Number) o).intValue(), equalTo(1));
 	}
 

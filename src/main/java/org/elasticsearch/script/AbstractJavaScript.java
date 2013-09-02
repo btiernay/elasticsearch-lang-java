@@ -18,6 +18,11 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 
 	@Override
+	public void setNextVar(String name, Object value) {
+		vars.put(name, value);
+	}
+
+	@Override
 	public Object run() {
 		return execute();
 	}
@@ -28,9 +33,8 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 		return vars.get(name);
 	}
 
-	@Override
-	public void setNextVar(String name, Object value) {
-		vars.put(name, value);
+	protected Object vars(char name) {
+		return vars.get(String.valueOf(name));
 	}
 
 }
