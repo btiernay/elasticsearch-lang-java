@@ -93,24 +93,6 @@ If your variables consist of a single character, you can simplify the above usin
 }
 ```
 
-
-If your variables are primitive wrappers, you can simplify the above using: 
-
-```json
-{
-    "script_fields" : {
-        "result" : {
-            "script" : "return integerVar('x') + intergerVar('y');",
-            "params": {
-                "x": 1,
-                "y": 2
-            }, 
-            "lang": "java"
-        }
-    }
-}
-```
-
 Disclaimer
 ----------
 
