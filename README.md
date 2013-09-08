@@ -27,10 +27,8 @@ Configuration
 
 In elasticsearch.yml you may [configure](http://www.elasticsearch.org/guide/reference/setup/configuration/) `plugin.script.java.imports` to have a `;`,`:` or `,` delimited list of imports:
 
-```
-script:
-  java
-    imports: "com.company.*;foo.bar.Baz"
+```yaml
+script.java.imports: "com.company.*;foo.bar.Baz"
 ```
 
 You may also dynamically define imports using the [Cluster Update Settings API](http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/):
@@ -44,7 +42,7 @@ curl -XPUT "http://localhost:9200/_cluster/settings" -d'
 }'
 ```
 
-The two settings are independent of one another and get concatenated at runtime.
+The two settings are completely independent of one another and get concatenated at runtime.
 
 Scripts
 -------
