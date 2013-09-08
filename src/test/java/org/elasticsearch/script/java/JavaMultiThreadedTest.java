@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class JavaMultiThreadedTest {
 
-	private static final String script = "return ((Long)vars(\"x\")) + ((Long)vars(\"y\"));";
+	private static final String script = "return ((Long)var(\"x\")) + ((Long)var(\"y\"));";
 
 	protected final ESLogger logger = Loggers.getLogger(getClass());
 
