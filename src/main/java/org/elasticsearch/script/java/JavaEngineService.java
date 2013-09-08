@@ -18,6 +18,7 @@ import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
+import org.elasticsearch.common.math.UnboxedMathUtils;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.script.AbstractJavaScript;
 import org.elasticsearch.script.ExecutableScript;
@@ -31,7 +32,7 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 	private static final AtomicInteger i = new AtomicInteger();
 
 	private static final String GENERATED_PACKAGE_NAME = JavaEngineService.class.getPackage().getName() + ".generated";
-	
+
 	protected final ESLogger logger = Loggers.getLogger(getClass());
 
 	@Inject
@@ -49,22 +50,38 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		return new String[] { "java" };
 	}
 
+	/**
+	 * See {@link org.elasticsearch.script.mvel.MvelScriptEngineService#MvelScriptEngineService(Settings)}
+	 * 
+	 * @return
+	 */
 	@Override
 	public Object compile(String script) {
+		String[] imports = settings.get("plugin.script.java.imports", "").split("[:;,]");
+		String classImports = "";
+		for (String classImport : imports) {
+			if (!"".equals(classImport)) {
+				classImports += "import " + classImport + ";\n";
+			}
+		}
+
 		String classPackage = GENERATED_PACKAGE_NAME;
 		String className = "GeneratedJavaScript" + i.incrementAndGet();
 		String classSource = "" + //
 				"// Generated on " + new Date() + "\n" + //
 				"package " + classPackage + ";\n" + //
-				"\n" + //
+
 				"import " + AbstractJavaScript.class.getName() + ";\n" + //
+				"import static " + UnboxedMathUtils.class.getName() + ".*;\n" + //
 				"import java.util.*;\n" + //
-				"import static java.lang.System.currentTimeMillis;\n" + //
-				"\n" + //
+				classImports + //
+
 				"public class " + className + " extends AbstractJavaScript {\n" + //
+
 				"   protected Object execute() {\n" + //
 				"      " + script + "\n" + //
 				"   }\n" + //
+
 				"}\n";
 
 		return compile(classPackage, className, classSource);

@@ -28,12 +28,21 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 
 	protected abstract Object execute();
+	
+	/**
+	 * See {@link org.elasticsearch.script.mvel.MvelScriptEngineService#MvelScriptEngineService(Settings)}
+	 * 
+	 * @return
+	 */
+	protected long time() {
+		return System.currentTimeMillis();
+	}
 
 	protected Object var(String name) {
 		return vars.get(name);
 	}
 
-	protected Object vars(char name) {
+	protected Object var(char name) {
 		return vars.get(String.valueOf(name));
 	}
 
@@ -42,7 +51,7 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 
 	protected Integer integerVar(char name) {
-		return (Integer) vars(name);
+		return (Integer) var(name);
 	}
 
 	protected Long longVar(String name) {
@@ -50,7 +59,7 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 	
 	protected Long longVar(char name) {
-		return (Long) vars(name);
+		return (Long) var(name);
 	}
 	
 	protected Float floatVar(String name) {
@@ -58,7 +67,7 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 	
 	protected Float floatVar(char name) {
-		return (Float) vars(name);
+		return (Float) var(name);
 	}
 	
 	protected Double doubleVar(String name) {
@@ -66,7 +75,7 @@ public abstract class AbstractJavaScript extends AbstractSearchScript {
 	}
 	
 	protected Double doubleVar(char name) {
-		return (Double) vars(name);
+		return (Double) var(name);
 	}
 	
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,7 +18,8 @@ public class JavaEngineServiceTest {
 
 	@BeforeClass
 	public static void setup() {
-		engine = new JavaEngineService(ImmutableSettings.Builder.EMPTY_SETTINGS);
+		Settings settings = ImmutableSettings.builder().put("plugin.script.java.imports", "java.lang.*;").build();
+		engine = new JavaEngineService(settings);
 	}
 
 	@AfterClass
@@ -40,7 +42,7 @@ public class JavaEngineServiceTest {
 		Object o = engine.execute(engine.compile("return vars(\"x\");"), vars);
 		assertThat(((Number) o).intValue(), equalTo(1));
 	}
-	
+
 	@Test
 	public void testSimpleVarAccessUsingCharName() {
 		Map<String, Object> vars = new HashMap<String, Object>();
@@ -49,7 +51,7 @@ public class JavaEngineServiceTest {
 		Object o = engine.execute(engine.compile("return vars('x');"), vars);
 		assertThat(((Number) o).intValue(), equalTo(1));
 	}
-	
+
 	@Test
 	public void testInvalidSimpleVarAccessUsingCharName() {
 		Map<String, Object> vars = new HashMap<String, Object>();

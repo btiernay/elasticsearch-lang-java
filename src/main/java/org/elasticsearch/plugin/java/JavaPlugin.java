@@ -1,5 +1,6 @@
 package org.elasticsearch.plugin.java;
 
+import org.elasticsearch.cluster.settings.ClusterDynamicSettingsModule;
 import org.elasticsearch.plugins.AbstractPlugin;
 import org.elasticsearch.script.ScriptModule;
 import org.elasticsearch.script.java.JavaEngineService;
@@ -20,4 +21,8 @@ public class JavaPlugin extends AbstractPlugin {
 		module.addScriptEngine(JavaEngineService.class);
 	}
 
+  public void onModule(ClusterDynamicSettingsModule module) {
+    module.addDynamicSettings("plugin.script.java.imports");
+	}
+  
 }
