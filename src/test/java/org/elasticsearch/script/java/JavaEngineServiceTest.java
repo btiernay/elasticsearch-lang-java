@@ -19,7 +19,7 @@ public class JavaEngineServiceTest {
 
 	@BeforeClass
 	public static void setup() {
-		Settings settings = ImmutableSettings.builder().put("plugin.script.java.imports", "java.lang.*;").build();
+		Settings settings = ImmutableSettings.builder().put("script.java.imports", "java.lang.*;").build();
 		engine = new JavaEngineService(settings);
 	}
 

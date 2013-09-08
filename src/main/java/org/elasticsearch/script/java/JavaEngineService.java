@@ -51,13 +51,15 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 	}
 
 	/**
-	 * See {@link org.elasticsearch.script.mvel.MvelScriptEngineService#MvelScriptEngineService(Settings)}
+	 * See
+	 * {@link org.elasticsearch.script.mvel.MvelScriptEngineService#MvelScriptEngineService(Settings)}
 	 * 
 	 * @return
 	 */
 	@Override
 	public Object compile(String script) {
-		String[] imports = settings.get("plugin.script.java.imports", "").split("[:;,]");
+		String[] imports = componentSettings.get("imports", "").split("[:;,]");
+
 		String classImports = "";
 		for (String classImport : imports) {
 			if (!"".equals(classImport)) {
