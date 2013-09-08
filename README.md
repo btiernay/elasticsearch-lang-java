@@ -25,10 +25,12 @@ For more information, see http://www.elasticsearch.org/guide/reference/modules/p
 Configuration
 -------------
 
-You may dynamically configure `plugin.script.java.imports` to have a `;`,`:` or `,` delimited list of imports:
+In elasticsearch.yml you may configure `plugin.script.java.imports` to have a `;`,`:` or `,` delimited list of imports:
 
 ```
-com.company.*;foo.bar.Baz;
+script:
+  java
+    imports: "com.company.*;foo.bar.Baz"
 ```
 
 Scripts
