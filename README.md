@@ -33,7 +33,7 @@ script.java.imports: "com.company.*;foo.bar.Baz"
 
 You may also dynamically define imports using the [Cluster Update Settings API](http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/):
 
-```shell
+```bash
 curl -XPUT "http://localhost:9200/_cluster/settings" -d'
 {
    "persistent": {
