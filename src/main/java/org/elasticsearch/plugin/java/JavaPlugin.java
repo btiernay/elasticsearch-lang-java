@@ -7,6 +7,8 @@ import org.elasticsearch.script.java.JavaEngineService;
 
 public class JavaPlugin extends AbstractPlugin {
 
+	private static final String SCRIPT_JAVA_IMPORTS = "script.java.imports";
+
 	@Override
 	public String name() {
 		return "lang-java";
@@ -21,8 +23,8 @@ public class JavaPlugin extends AbstractPlugin {
 		module.addScriptEngine(JavaEngineService.class);
 	}
 
-  public void onModule(ClusterDynamicSettingsModule module) {
-    module.addDynamicSettings("plugin.script.java.imports");
+	public void onModule(ClusterDynamicSettingsModule module) {
+		module.addDynamicSettings(SCRIPT_JAVA_IMPORTS);
 	}
-  
+
 }

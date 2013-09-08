@@ -13,7 +13,9 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
+import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.base.Splitter;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.logging.ESLogger;
@@ -33,11 +35,16 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 	private static final String GENERATED_PACKAGE_NAME = JavaEngineService.class.getPackage().getName() + ".generated";
 
-	protected final ESLogger logger = Loggers.getLogger(getClass());
+	private static final ESLogger logger = Loggers.getLogger(JavaEngineService.class);
+
+	private static final Splitter SPLITTER = Splitter.onPattern("[;:,]").trimResults().omitEmptyStrings();
+
+	private final ClusterService clusterService;
 
 	@Inject
-	public JavaEngineService(Settings settings) {
+	public JavaEngineService(Settings settings, ClusterService clusterService) {
 		super(settings);
+		this.clusterService = clusterService;
 	}
 
 	@Override
@@ -58,13 +65,9 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 	 */
 	@Override
 	public Object compile(String script) {
-		String[] imports = componentSettings.get("imports", "").split("[:;,]");
-
 		String classImports = "";
-		for (String classImport : imports) {
-			if (!"".equals(classImport)) {
-				classImports += "import " + classImport + ";\n";
-			}
+		for (String classImport : getImports()) {
+			classImports += "import " + classImport + ";\n";
 		}
 
 		String classPackage = GENERATED_PACKAGE_NAME;
@@ -125,16 +128,27 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 		logger.debug("Compiling java script class:\n{}", classSource);
 		Boolean success = compiler.getTask(writer, fileManager, null, options(), null, javaFiles).call();
 		if (!success) {
-			throw new ScriptException("Could not compile java script class: " + classSource + " because: "
+			throw new ScriptException("Failed to compile java script class: " + classSource + " because: "
 					+ writer.toString());
 		}
 
 		try {
 			return fileManager.getClassLoader(null).loadClass(qualifiedClassName);
 		} catch (Exception e) {
-			throw new ScriptException("Exception loading script class: " + qualifiedClassName + " with source:\n"
-					+ classSource, e);
+			throw new ScriptException("Failed to load script class: " + qualifiedClassName + " with source:\n" + classSource,
+					e);
 		}
+	}
+
+	private Iterable<String> getImports() {
+		Settings dynamicSettings = clusterService.state().metaData().persistentSettings()
+				.getComponentSettings(this.getClass());
+		String setting = "imports";
+		String defaultValue = "";
+		String dynamicValue = dynamicSettings.get(setting, defaultValue);
+		String staticValue = componentSettings.get(setting, defaultValue);
+		String value = dynamicValue + ":" + staticValue;
+		return SPLITTER.split(value);
 	}
 
 	private static AbstractJavaScript newInstance(Object compiledScript, Map<String, Object> vars, SearchLookup lookup) {
@@ -154,7 +168,7 @@ public class JavaEngineService extends AbstractComponent implements ScriptEngine
 
 			return script;
 		} catch (Exception e) {
-			throw new ScriptException("Exception instantiating script object: " + compiledScript, e);
+			throw new ScriptException("Failed to instantiate script class: " + compiledScript, e);
 		}
 	}
 
