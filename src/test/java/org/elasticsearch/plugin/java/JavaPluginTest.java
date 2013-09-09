@@ -21,50 +21,52 @@ import com.github.tlrx.elasticsearch.test.EsSetup;
 
 public class JavaPluginTest {
 
-	/**
-	 * ES facade.
-	 */
-	protected EsSetup es;
+  /**
+   * ES facade.
+   */
+  protected EsSetup es;
 
-	@Before
-	public void before() {
-		Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, "org.elasticsearch.*").build();
-		es = new EsSetup(settings);
-		es.execute(createIndex("index1"));
-	}
+  @Before
+  public void before() {
+    String nodeImports = "org.elasticsearch.*";
+    Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, nodeImports).build();
+    es = new EsSetup(settings);
+    es.execute(createIndex("index1"));
+  }
 
-	@After
-	public void after() {
-		es.terminate();
-	}
+  @After
+  public void after() {
+    es.terminate();
+  }
 
-	@Test
-	public void testScriptField() throws InterruptedException, ExecutionException {
-		Client client = es.client();
+  @Test
+  public void testScriptField() throws InterruptedException, ExecutionException {
+    Client client = es.client();
 
-		String id = "id1";
-		Map<String, Object> document = ImmutableMap.<String, Object> builder().put("field1", "value1")
-				.put("field2", "value2").build();
-		IndexResponse indexResponse = client.prepareIndex("index1", "type1").setId(id).setSource(document).setRefresh(true)
-				.execute().get();
-		assertThat(indexResponse.getId()).isEqualTo(id);
+    // Index
+    String id = "id1";
+    Map<String, Object> document = ImmutableMap.<String, Object> builder().put("field1", "value1").put("field2", "value2").build();
+    
+    IndexResponse indexResponse = client.prepareIndex("index1", "type1").setId(id).setSource(document).setRefresh(true).execute().get();
+    assertThat(indexResponse.getId()).isEqualTo(id);
 
-		String imports = "org.elasticsearch.*";
-		Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, imports).build();
-		ClusterUpdateSettingsResponse settingsResponse = client.admin().cluster().prepareUpdateSettings()
-				.setPersistentSettings(settings).execute().get();
-		assertThat(settingsResponse.getPersistentSettings().get(JavaPlugin.SCRIPT_JAVA_IMPORTS)).isEqualTo(imports);
+    // Configure
+    String clusterImports = "java.io.*";
+    Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, clusterImports).build();
 
-		int x = 1;
-		int y = 1;
-		int sum = x + y;
-		Map<String, Object> params = ImmutableMap.<String, Object> builder().put("x", x).put("y", y).build();
-		String script = "return (Integer)var('x') + (Integer)var('y');";
+    ClusterUpdateSettingsResponse settingsResponse = client.admin().cluster().prepareUpdateSettings().setPersistentSettings(settings).execute().get();
+    assertThat(settingsResponse.getPersistentSettings().get(JavaPlugin.SCRIPT_JAVA_IMPORTS)).isEqualTo(clusterImports);
 
-		SearchResponse searchResponse = client.prepareSearch("index1").addScriptField("result", "java", script, params)
-				.execute().get();
-		Integer result = searchResponse.getHits().getHits()[0].getFields().get("result").getValue();
-		assertThat(result).isEqualTo(sum);
-	}
+    // Test
+    int x = 1;
+    int y = 1;
+    int sum = x + y;
+    Map<String, Object> params = ImmutableMap.<String, Object> builder().put("x", x).put("y", y).build();
+    String script = "System.out.println(Version.CURRENT); return (Integer)var('x') + (Integer)var('y');";
+
+    SearchResponse searchResponse = client.prepareSearch("index1").addScriptField("result", "java", script, params).execute().get();
+    Integer result = searchResponse.getHits().getHits()[0].getFields().get("result").getValue();
+    assertThat(result).isEqualTo(sum);
+  }
 
 }
