@@ -118,7 +118,7 @@ If your variables consist of a single character, you can simplify the above usin
 Disclaimer
 ----------
 
-This plugin has not been tested in production and is currently for development purposes only.
+This plugin has not been tested in a production environment and is currently for development purposes only.
 
 License
 -------
