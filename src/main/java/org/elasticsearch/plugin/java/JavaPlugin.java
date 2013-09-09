@@ -7,7 +7,7 @@ import org.elasticsearch.script.java.JavaEngineService;
 
 public class JavaPlugin extends AbstractPlugin {
 
-	private static final String SCRIPT_JAVA_IMPORTS = "script.java.imports";
+	public static final String SCRIPT_JAVA_IMPORTS = "script.java.imports";
 
 	@Override
 	public String name() {

@@ -6,10 +6,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.ImmutableMap;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +28,8 @@ public class JavaPluginTest {
 
 	@Before
 	public void before() {
-		es = new EsSetup();
+		Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, "org.elasticsearch.*").build();
+		es = new EsSetup(settings);
 		es.execute(createIndex("index1"));
 	}
 
@@ -45,12 +49,18 @@ public class JavaPluginTest {
 				.execute().get();
 		assertThat(indexResponse.getId()).isEqualTo(id);
 
+		String imports = "org.elasticsearch.*";
+		Settings settings = ImmutableSettings.builder().put(JavaPlugin.SCRIPT_JAVA_IMPORTS, imports).build();
+		ClusterUpdateSettingsResponse settingsResponse = client.admin().cluster().prepareUpdateSettings()
+				.setPersistentSettings(settings).execute().get();
+		assertThat(settingsResponse.getPersistentSettings().get(JavaPlugin.SCRIPT_JAVA_IMPORTS)).isEqualTo(imports);
+
 		int x = 1;
 		int y = 1;
 		int sum = x + y;
 		Map<String, Object> params = ImmutableMap.<String, Object> builder().put("x", x).put("y", y).build();
 		String script = "return (Integer)var('x') + (Integer)var('y');";
-		
+
 		SearchResponse searchResponse = client.prepareSearch("index1").addScriptField("result", "java", script, params)
 				.execute().get();
 		Integer result = searchResponse.getHits().getHits()[0].getFields().get("result").getValue();
